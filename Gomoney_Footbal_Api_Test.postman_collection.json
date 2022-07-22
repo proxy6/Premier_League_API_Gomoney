@@ -1,0 +1,421 @@
+{
+	"info": {
+		"_postman_id": "9d71dfbd-0368-4c7b-ac11-b4eae28e6eb6",
+		"name": "Gomoney_Footbal_Api_Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12362586"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"name\": \"Progress Eze\",\r\n\"email\": \"progresseze@gmail.com\",\r\n\"password\": \"19960000\",\r\n\"role\": \"user\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/identity/signup",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"identity",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"progresseze@gmail.com\",\r\n    \"password\": \"19960000\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/identity/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"identity",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Team",
+			"item": [
+				{
+					"name": "Add team",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImVtYWlsIjoicHJvZ3Jlc3NlemVAZ21haWwuY29tIiwiX2lkIjoiNjJkNTNlYjIwNTc4ZTAzMDI0ZDlkMTljIiwicm9sZSI6InVzZXIifSwiaWF0IjoxNjU4MTU4NDA4LCJleHAiOjE2NTgyNDQ4MDh9.Zpa3bLecZ_oa7Fo25CrOB8eWJyCXESiYgiFRfTM0M7g",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Chelsea Football Club\",\r\n    \"short_name\": \"Chelsea FC\",\r\n    \"stadium\": \"Abia\",\r\n    \"userId\": \"62d53eb20578e03024d9d19c\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/team/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"team",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View all teams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/team/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"team",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View single team",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/team/{{teamId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"team",
+								"{{teamId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit team",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Chelsea Football Club\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/team/edit/{{teamId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"team",
+								"edit",
+								"{{teamId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete Team",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/team/delete/{{teamId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"team",
+								"delete",
+								"{{teamId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fixture",
+			"item": [
+				{
+					"name": "Create Fixture",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"home_team\": \"62d5bd48125c87a4328c9e7b\",\r\n    \"away_team\": \"62d5cfb323b14081e912d926\",\r\n    \"season\": \"2022/2023\",\r\n    \"userId\": \"62d53eb20578e03024d9d19c\",\r\n    \"matchtime\": \"2023-05-01 09:00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View All Fixtures",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View single fixture",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/{{fixtureId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								"{{fixtureId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit fixture",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"season\": \"2023/2024\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/edit/{{fixtureId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								"edit",
+								"{{fixtureId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Fixture",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/delete/{{fixtureId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								"delete",
+								"{{fixtureId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get  Pending Fixtures",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"62d5d2cbfafb21b50b5d81c1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5005/fixture/pending",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5005",
+							"path": [
+								"fixture",
+								"pending"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Fixture By link",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/unique/ddb4cf1123a0476b96bdccf0fa04fec6",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								"unique",
+								"ddb4cf1123a0476b96bdccf0fa04fec6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get completed fixtures",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:{{PORT}}/fixture/completed/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"fixture",
+								"completed",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "fixtureId",
+			"value": "62d5d0c8c051c715157b7680"
+		},
+		{
+			"key": "PORT",
+			"value": "5005"
+		},
+		{
+			"key": "teamId",
+			"value": "62d5bc8262e8fc0f72ea6c3a"
+		},
+		{
+			"key": "uniqueLinkId",
+			"value": "69f19e2096e04c44819326046d0b5684"
+		}
+	]
+}
