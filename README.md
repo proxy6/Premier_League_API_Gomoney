@@ -5,5 +5,9 @@
 * To start the application run `npm run start`
 
 ### Endpoints
+ALL `http://localhost:5005/`
 
-ALL `http://localhost:5007/`
+### Documentation
+https://documenter.getpostman.com/view/12362586/UzXLzJ24
+
+### Heroku Link

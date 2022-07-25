@@ -1,3 +1,4 @@
+import { func } from '@hapi/joi';
 import { Schema, model } from 'mongoose';
 export interface IUser{
     name: String;
@@ -14,6 +15,7 @@ const userSchema = new Schema<IUser>({
   }, {
     timestamps: true
   });
-
+  
   const User = model<IUser>('User', userSchema);
+
   export default User

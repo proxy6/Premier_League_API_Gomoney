@@ -5,6 +5,7 @@ import database from '../database'
 import User from '../model/user.model'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
+import LoginUser from '../controller/user.controller';
 
 describe('USER Login /identity/login', ()=>{
     beforeAll(async()=>{
@@ -46,40 +47,46 @@ describe('USER Login /identity/login', ()=>{
 			expect(response.body).toEqual({message: "User Does not Exist"});
 		});
 	});
-    describe('Request fails if User  is Not Authenticated', () => {
+    describe('Request fails if User Exist but Password is Not Correct', () => {
 		let response;
 		const exampleEmail = 'example@gmail.com';
 		const Args = {
-			name: exampleEmail,
-			password: 'thisisapass'
+			email: exampleEmail,
+			password: 'thisisapass',
+            name: "Example Name"
 		};
 
 		beforeAll(async () => {
-            await User.findOne({email: exampleEmail})
+            await LoginUser.findOrCreate(exampleEmail, Args)
 			response = await request(app)
             .post('/identity/login')
-            .send(Args)
+            .send({
+                email: exampleEmail,
+				password: 'nothepassword'
+            })
 		});
-
 		it('returns 401 status code', () => {
 			expect(response.status).toBe(401);
 		});
-
 		it('returns error message', () => {
 			expect(response.body).toEqual({message: "Email or Password Incorrect"});
 		});
 	});
-    describe('Request succeds if User  is Authenticated', () => {
+    describe('Request succeds if User Password is Correct', () => {
 		let response;
-		const exampleEmail = 'example@gmail.com';
+		const exampleEmail = 'thisisanemail@gmail.com';
 		const Args = {
-			name: exampleEmail,
-			password: 'thisisapassword'
+			email: exampleEmail,
+			password: 'thisisapassword',
+            name: "Example Name"
 		};
 
 		beforeAll(async () => {
-            await User.findOne({email: exampleEmail})
-			response = await request(app).post('/identity/login').send(Args);
+            await LoginUser.findOrCreate(exampleEmail, Args)
+			response = await request(app).post('/identity/login').send({
+                name: exampleEmail,
+			    password: 'thisisapassword'
+            });
 		});
 
 		it('returns 201 status code', () => {

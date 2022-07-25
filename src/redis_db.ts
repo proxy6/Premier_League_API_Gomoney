@@ -1,4 +1,3 @@
 import * as redis from 'redis'
-const REDIS_PORT = process.env.REDIS_PORT || 6379
-const RedisDB = redis.createClient()    
+const RedisDB = redis.createClient({url: process.env.REDIS_URL})    
 export default RedisDB

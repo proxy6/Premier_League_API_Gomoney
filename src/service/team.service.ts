@@ -1,22 +1,30 @@
+import RedisDB from "../redis_db"
 import Team, { ITeam } from "../model/team.model"
 
 class TeamService{
-    async CreateTeam(teamData: Partial<ITeam>){
+    static async CreateTeam(teamData: Partial<ITeam>){
         try{
             return Team.create(teamData)
         }catch(e){
             throw new Error('Unable to Create Team')
         }
     }
-    async ViewAllTeams(){
+    static async ViewAllTeams(){
         try{
+        const cached= await RedisDB.GET('teams')
+        if(cached){
+        console.log(cached) 
+        return JSON.parse(cached)
+        }
         const team = await Team.find({})
+        await RedisDB.SET('teams', JSON.stringify(team))
         return team
     }catch(e){
+        console.log(e)
         throw new Error('Unable to View Teams')
     }
     }
-    async ViewSingleTeam(teamData: any){
+    static async ViewSingleTeam(teamData: any){
         const {teamId} = teamData
         try{
             const team = await Team.findOne({_id: teamId})
@@ -25,7 +33,7 @@ class TeamService{
             throw new Error('Unable to View Team')
         }
     }
-    async EditTeam(teamData:any){
+    static async EditTeam(teamData:any){
         const {teamId, name, short_name, stadium} = teamData
         try{
             let team = await Team.updateOne({_id: teamId}, {name, short_name, stadium})
@@ -34,7 +42,7 @@ class TeamService{
             throw new Error('Unable to Update Team')
         }
     }
-    async DeleteTeam(teamData: any){
+    static async DeleteTeam(teamData: any){
         const {teamId} = teamData
         try{
             const team = await Team.deleteOne({_id: teamId})

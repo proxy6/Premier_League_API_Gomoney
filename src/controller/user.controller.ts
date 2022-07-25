@@ -2,6 +2,7 @@ import {Request, Response} from 'express'
 import UserService from '../service/user.service'
 import createUser from '../util/validation'
 import { GenerateSignature, HashPassword, validatePassword } from '../util/auth'
+import User from '../model/user.model'
 
 
 export const signUp = async (req: Request, res: Response)=>{
@@ -49,7 +50,24 @@ class LoginUser{
         token: token
        })
   }
+  static async findOrCreate(email, ...userData){
+    const foundUser = User.findOne({email: email})
+    if(!foundUser){
+      const user  = User.create({userData})
+      console.log(user)
+      const token = await GenerateSignature({data:{email: (await user).email, role: (await user).role, _id: (await user)._id}})
+      return Object.assign(user, {
+        token: token
+       })
+    }
+    const token = await GenerateSignature({data:{email: (await foundUser).email, role: (await foundUser).role, _id: (await foundUser)._id}})
+      return Object.assign(foundUser, {
+        token: token
+       })
+  }
 }
+
+
 export default LoginUser
 
 
