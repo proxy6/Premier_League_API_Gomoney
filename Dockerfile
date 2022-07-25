@@ -1,6 +1,6 @@
 FROM node:14.16-alpine as development
 WORKDIR /src
-ADD package*.json ./
+COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
@@ -8,7 +8,7 @@ RUN npm run build
 
 FROM node:14.16-alpine as production
 WORKDIR /src
-ADD package*.json .
+COPY package*.json .
 RUN npm install
 COPY --from=development /src/dist ./dist
 
