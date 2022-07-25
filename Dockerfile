@@ -1,11 +1,19 @@
-FROM node:alpine
-WORKDIR /gict
+FROM node:14.16-alpine as development
+WORKDIR /src
 ADD package*.json ./
-# COPY package.json /gict/package.json
 RUN npm install
-ADD . .
-# COPY . /gict/
-ENV PORT 80
-CMD node app.js
-# CMD ["node", "/gict/app.js"]
+COPY . .
+RUN npm run build
+
+
+FROM node:14.16-alpine as production
+WORKDIR /src
+ADD package*.json .
+RUN npm install
+COPY --from=development /src/dist ./dist
+
+CMD ["node", "dist/index.js"]
+
+
+
 

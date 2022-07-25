@@ -1,10 +1,12 @@
 import { config } from 'dotenv'
 import app from './server'
 config();
-import database from './database'
-
+import mongooseDB from './database'
+import RedisDB from './redis_db';
 const port = process.env.PORT || 3000
-database().then(()=>{
+mongooseDB().then(()=>{   
+   RedisDB.on('connect', ()=> console.log(`Redis is connected to Port `))
+   RedisDB.on('error', (error)=> console.log(console.error(error)))
     app.listen(port, ()=>{
         console.log(`Listening to port ${port}`)
     })

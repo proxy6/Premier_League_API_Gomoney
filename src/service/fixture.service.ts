@@ -1,7 +1,11 @@
 import { AnyAaaaRecord } from "dns"
+import RedisDB from "src/redis_db"
 import Fixture from "../model/fixtures.model"
 import FixtureLink from "../model/fixture_link.model"
-
+// mongoose.Query.prototype.exec = async function() {
+//     const key = JSON.stringify({
+//       ...this.getQuery()
+//     });
 class FixtureService{
     async CreateFixture(data: any){
         const {home_team, away_team, season, userId, matchtime, link} = data
@@ -40,6 +44,8 @@ class FixtureService{
     }
     async GetAllFixtures(){
         try{
+           
+            //get from cache
             const fixtures = await Fixture.find()
             return fixtures
         }catch(e){

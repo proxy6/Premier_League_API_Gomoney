@@ -5,9 +5,9 @@ import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
 export const SECRET_KEY: Secret = 'JWT_Secret';
 import {Request} from 'express'
 
-export interface CustomRequest extends Request {
-    token?: 'some value'
-   }
+// export interface CustomRequest extends Request {
+//     token?: 'some value'
+//    }
 
 const app = express();
 app.use(express.json({ limit: '1mb'}));

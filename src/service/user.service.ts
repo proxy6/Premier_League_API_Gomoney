@@ -1,10 +1,12 @@
 import User from "../model/user.model"
+import * as jwt from 'jsonwebtoken'
+class UserService extends User{
 
-class UserService{
-
-    async SignUp(userData: any){
+    static async SignUp(userData: any){
         const {name, email, userPassword, role} = userData
         try{
+            // const existingUser = await User.findOne({email})
+            // if(existingUser) return 
             const user = new User({
                 name,
                 email,
@@ -12,19 +14,23 @@ class UserService{
                 role: role || 'user',
                 })
             const newUser = await user.save()
+            newUser.password = ''
             return newUser
         }catch(e){
            throw new Error('Unable to Signup User')
         }
     }
-    async Login(userData: any){
+   static async Login(userData: any){
          const {email} = userData
     try{
         const user = await User.findOne({email: email})
+        if(!user) return 
+        user.password = ''
         return user
     }catch(e){
         throw new Error('Unable to Find User')
     }
     }
+    
 }
 export default UserService;

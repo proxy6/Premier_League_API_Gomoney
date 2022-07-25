@@ -20,6 +20,6 @@ const fixtureSchema = new Schema<IFixture>({
   }, {
     timestamps: true
   });
-  
+    fixtureSchema.index({home_team: "text", away_team: "text", season: "text"})
   const Fixture = model<IFixture>('Fixture', fixtureSchema);
   export default Fixture
