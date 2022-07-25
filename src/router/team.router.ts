@@ -5,9 +5,9 @@ import { isAuthorized } from '../middleware/auth'
 
 const router = Router()
 router.post('/', isAuthorized('admin'), addTeam)
-router.get('/', viewAllTeams)
-router.get('/:teamId', viewSingleTeam)
-router.patch('/edit/:teamId', editTeam) 
-router.delete('/delete/:teamId', deleteTeam)
+router.get('/', isAuthorized('admin', 'user'), viewAllTeams)
+router.get('/:teamId', isAuthorized('admin', 'user'), viewSingleTeam)
+router.patch('/edit/:teamId', isAuthorized('admin'), editTeam) 
+router.delete('/delete/:teamId', isAuthorized('admin'), deleteTeam)
 
 export default router

@@ -1,4 +1,5 @@
-import jwt, { Secret, JwtPayload } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
+import { Secret, JwtPayload } from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
 export const SECRET_KEY: Secret = 'JWT_Secret';
@@ -6,38 +7,19 @@ export const SECRET_KEY: Secret = 'JWT_Secret';
 export interface CustomRequest extends Request {
  token: string | JwtPayload;
 }
-
 export const isAuthorized = (...role: string[])=> async (req: Request, res: Response, next: NextFunction) => {
  try {
    const token = req.header('Authorization')?.replace('Bearer ', '');
-
-   if (!token) throw new Error();
+   if (!token) return res.status(401).json({message: "User is not Authenticated"});
    const decoded = jwt.verify(token, SECRET_KEY);
    (req as CustomRequest).token = decoded;
-   console.log(!role.length)
-   console.log(role.includes((decoded as JwtPayload).data.role))
-   if(role.length || role.includes((decoded as JwtPayload).data.role)){
-   next();
+    if(role.length && role.includes((decoded as JwtPayload).data.role)){
+    next();
    }else{
-    res.status(401).send('User is not Authorized');
+    res.status(401).json({message:'User is not Authorized'});
    }
  } catch (err) {
-   res.status(401).send('Please authenticate');
+  console.log(err)
+   res.status(401).send('Unable To Complete Authentication');
  }
 };
-export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const token = req.header('Authorization')?.replace('Bearer ', '');
-   
-      if (!token) {
-        throw new Error();
-      }
-   
-      const decoded = jwt.verify(token, SECRET_KEY);
-      (req as CustomRequest).token = decoded;
-      next();
-    } catch (err) {
-       console.log(err)
-      res.status(401).send('Please authenticate');
-    }
-   };

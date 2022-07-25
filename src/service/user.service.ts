@@ -25,7 +25,6 @@ class UserService extends User{
     try{
         const user = await User.findOne({email: email})
         if(!user) return 
-        user.password = ''
         return user
     }catch(e){
         throw new Error('Unable to Find User')

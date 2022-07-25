@@ -1,17 +1,9 @@
-import Team from "../model/team.model"
+import Team, { ITeam } from "../model/team.model"
 
 class TeamService{
-    async CreateTeam(teamData: any){
-        const {name, short_name, stadium, userId} = teamData
+    async CreateTeam(teamData: Partial<ITeam>){
         try{
-            const team = await new Team({
-                name,
-                short_name,
-                stadium,
-                created_by: userId
-            })
-        const newTeam = await team.save()
-        return newTeam
+            return Team.create(teamData)
         }catch(e){
             throw new Error('Unable to Create Team')
         }

@@ -56,7 +56,9 @@ describe('USER Login /identity/login', ()=>{
 
 		beforeAll(async () => {
             await User.findOne({email: exampleEmail})
-			response = await request(app).post('/identity/login').send(Args);
+			response = await request(app)
+            .post('/identity/login')
+            .send(Args)
 		});
 
 		it('returns 401 status code', () => {

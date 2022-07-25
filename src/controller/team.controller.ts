@@ -8,7 +8,7 @@ export const addTeam = async(req: Request, res: Response)=>{
     }
     //write validation
     try{
-      const team = await service.CreateTeam({name, short_name, stadium, userId})
+      const team = await service.CreateTeam({name, short_name, stadium, created_by:userId})
       res.status(201).json({message: "Team Created", data: team})
     }catch(e){
         res.status(500).json({message: "Error Creating Teams"})

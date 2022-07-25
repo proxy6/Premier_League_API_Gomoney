@@ -16,6 +16,7 @@ export const HashPassword = async (password: any) => {
 }
 export const validatePassword = async (password: any, savedPassword: any)=>{
     const validatePassword = bcrypt.compareSync(password, savedPassword)
+    console.log(validatePassword)
     if(!validatePassword) return false
     return true
     
