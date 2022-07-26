@@ -30,6 +30,11 @@ class UserService extends User{
         throw new Error('Unable to Find User')
     }
     }
+    static async FindOrCreate(email, ...Args){
+        let user = await User.findOne({email})
+        if(!user) return await User.create(Args)
+        return user
+    }
     
 }
 export default UserService;

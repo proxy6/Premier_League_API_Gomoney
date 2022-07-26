@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import { BulkAddFixures, BulkAddTeam } from '../seedDB'
+import { BulkAddFixures, BulkAddTeam } from '../controller/seedDB'
 
 const router = Router()
 

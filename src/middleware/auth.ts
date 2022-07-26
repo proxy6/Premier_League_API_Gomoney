@@ -20,6 +20,6 @@ export const isAuthorized = (...role: string[])=> async (req: Request, res: Resp
    }
  } catch (err) {
   console.log(err)
-   res.status(401).send('Unable To Complete Authentication');
+   res.status(401).json({message:'Unable To Complete Authentication'});
  }
 };

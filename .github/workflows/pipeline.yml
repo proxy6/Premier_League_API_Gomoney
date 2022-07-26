@@ -7,7 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-
   image-build: 
     runs-on: ubuntu-latest
     steps:

@@ -3,14 +3,14 @@ import { pendingFixture, createFixture, deleteFixture, editFixture, getAllFixtur
 import { isAuthorized } from '../middleware/auth';
 
 const router = Router();
-router.post('/', createFixture)
-router.get('/', getAllFixtures)
-router.get('/completed',isAuthorized('user'), completedFixture)
-router.post('/pending', pendingFixture)
-router.get('/:fixtureId', getSingleFixture)
-router.patch('/edit/:fixtureId', editFixture)
-router.delete('/delete/:fixtureId', deleteFixture)
-router.get('/unique/:uniqueLink', viewFixtureByUniqueLink)
+router.post('/', isAuthorized('admin'), createFixture)
+router.get('/', isAuthorized('admin', 'user'), getAllFixtures)
+router.get('/completed',isAuthorized('user', 'admin'), completedFixture)
+router.post('/pending', isAuthorized('admin', 'user'), pendingFixture)
+router.get('/:fixtureId', isAuthorized('admin', 'user'), getSingleFixture)
+router.patch('/edit/:fixtureId', isAuthorized('admin'), editFixture)
+router.delete('/delete/:fixtureId', isAuthorized('admin'), deleteFixture)
+router.get('/unique/:uniqueLink', isAuthorized('admin', 'user'), viewFixtureByUniqueLink)
 
 
 export default router

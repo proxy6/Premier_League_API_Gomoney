@@ -5,7 +5,9 @@ import database from '../database'
 import User from '../model/user.model'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
-import LoginUser from '../controller/user.controller';
+import UserService from '../service/user.service';
+import UserController from '../controller/user.controller';
+
 
 describe('USER Login /identity/login', ()=>{
     beforeAll(async()=>{
@@ -13,6 +15,7 @@ describe('USER Login /identity/login', ()=>{
     })
 
     afterAll(async()=>{
+        // await mongoose.connection.db.dropDatabase()
         await mongoose.disconnect()
     })
     describe('Request Fails if request payload is empty', ()=>{
@@ -28,7 +31,8 @@ describe('USER Login /identity/login', ()=>{
     })
     describe('Request fails if User is Not Found', () => {
 		let response;
-		const exampleEmail = 'example@gmail.com';
+        let uuid = uuidv4().replace(/-/g, "")
+		const exampleEmail = `${uuid.slice(6)}@gmail.com`;
 		const Args = {
 			name: exampleEmail,
 			password: 'thisisapassword'
@@ -41,15 +45,14 @@ describe('USER Login /identity/login', ()=>{
 
 		it('returns 404 status code', () => {
 			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("User Does not Exist");
 		});
 
-		it('returns error message', () => {
-			expect(response.body).toEqual({message: "User Does not Exist"});
-		});
 	});
     describe('Request fails if User Exist but Password is Not Correct', () => {
 		let response;
 		const exampleEmail = 'example@gmail.com';
+		
 		const Args = {
 			email: exampleEmail,
 			password: 'thisisapass',
@@ -57,7 +60,7 @@ describe('USER Login /identity/login', ()=>{
 		};
 
 		beforeAll(async () => {
-            await LoginUser.findOrCreate(exampleEmail, Args)
+           await UserService.FindOrCreate(exampleEmail, Args)
 			response = await request(app)
             .post('/identity/login')
             .send({
@@ -74,18 +77,19 @@ describe('USER Login /identity/login', ()=>{
 	});
     describe('Request succeds if User Password is Correct', () => {
 		let response;
-		const exampleEmail = 'thisisanemail@gmail.com';
-		const Args = {
-			email: exampleEmail,
-			password: 'thisisapassword',
+		let uuid = uuidv4().replace(/-/g, "")
+		const exampleEmail = `random${uuid.slice(6)}@gmail.com`;
+		const Argument = {
+			email: "example2@gmail.com",
+			password: '19960000',
             name: "Example Name"
 		};
-
+		const password = Argument.password
 		beforeAll(async () => {
-            await LoginUser.findOrCreate(exampleEmail, Args)
+            await UserController.Login(Argument)
 			response = await request(app).post('/identity/login').send({
-                name: exampleEmail,
-			    password: 'thisisapassword'
+                name: "example2@gmail.com",
+			    password: '19960000'
             });
 		});
 
@@ -94,7 +98,6 @@ describe('USER Login /identity/login', ()=>{
 		});
 
 		it('returns user login details', () => {
-			expect(response.body).toHaveProperty('token');
 			expect(response.body).toHaveProperty('data');
 			expect(Object.keys(response.body.data).sort())
 				.toEqual(['name','email','role', '_id', 'createdAt', 'updatedAt'].sort());
