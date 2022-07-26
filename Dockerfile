@@ -7,12 +7,12 @@ RUN npm run build
 
 
 FROM node:14.16-alpine as production
-WORKDIR /src
+WORKDIR /dist
 COPY package*.json ./
 RUN npm install
-COPY --from=development /src/dist ./dist
+COPY --from=development /src/dist ./
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "src/index.js"]
 
 
 
