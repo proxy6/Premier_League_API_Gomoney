@@ -1,7 +1,7 @@
 require('dotenv').config();
 import * as request from 'supertest';
-import app from '../../src/server';
-import database from '../../src/database'
+import app from '../server';
+import database from '../database'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
 
