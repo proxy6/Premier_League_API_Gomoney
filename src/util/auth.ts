@@ -1,12 +1,12 @@
 
-import { NextFunction, Request, Response } from 'express'
 import * as jwt from 'jsonwebtoken'
 import { Secret, JwtPayload }  from 'jsonwebtoken'
 import * as bcrypt from 'bcrypt'
-export const SECRET_KEY: Secret = 'JWT_Secret';
+const SECRET_KEY = `${process.env.JWT_SECRET}`
+
 
 export const GenerateSignature = async (payload: any) => {
-    console.log(SECRET_KEY)
+
     return await jwt.sign(payload, SECRET_KEY, { expiresIn: '1d'} )
 }
 export const HashPassword = async (password: any) => {

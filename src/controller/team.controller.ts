@@ -4,13 +4,14 @@ import TeamService from '../service/team.service'
 export const addTeam = async(req: Request, res: Response)=>{
     let {name, short_name, stadium, userId} = req.body
     if(Object.keys(req.body).length === 0 ){
-        res.status(400).json({message: 'Request Body is empty'})
+        return res.status(400).json({message: 'Request Body is empty'})
     }
     //write validation
     try{
       const team = await TeamService.CreateTeam({name, short_name, stadium, created_by:userId})
       res.status(201).json({message: "Team Created", data: team})
     }catch(e){
+        console.log(e)
         res.status(500).json({message: "Error Creating Teams"})
     }
 }

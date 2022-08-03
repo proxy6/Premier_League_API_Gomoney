@@ -10,7 +10,7 @@ const teamSchema = new Schema<ITeam>({
     name: { type: String, required: true },
     short_name: { type: String, required: true },
     stadium: {type: String, required: true},
-    created_by: {type: 'ObjectId', ref: "User"}
+    created_by: {type: 'ObjectId', ref: "User", required: true}
   }, {
     timestamps: true
   });

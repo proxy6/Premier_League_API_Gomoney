@@ -1,6 +1,6 @@
-import { config } from 'dotenv'
+import * as dotenv from 'dotenv'
 import app from './server'
-config();
+dotenv.config();
 import mongooseDB from './database'
 import RedisDB from './redis_db';
 const port = process.env.PORT || 3000
