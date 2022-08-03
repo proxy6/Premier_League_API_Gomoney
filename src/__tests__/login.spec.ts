@@ -1,12 +1,12 @@
 require('dotenv').config();
 import * as request from 'supertest';
-import app from "../server";
-import database from '../database'
-import User from '../model/user.model'
+import app from "../../src/server";
+import database from '../../src/database'
+import User from '../../src/model/user.model'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
-import UserService from '../service/user.service';
-import UserController from '../controller/user.controller';
+import UserService from '../../src/service/user.service';
+import UserController from '../../src/controller/user.controller';
 
 
 describe('USER Login /identity/login', ()=>{

@@ -6,12 +6,13 @@ import FixtureService from '../service/fixture.service'
 const service = new FixtureService()
 export const createFixture = async(req: Request, res: Response)=>{
     let {home_team, away_team, season, userId, matchtime} = req.body
-    let id = uuidv4()
-    let str = id.replace(/-/g, '')
-    let link = `https://${req.headers.host}${req.baseUrl}/${str}`
+    if(Object.keys(req.body).length === 0 ){
+        return res.status(400).json({message: 'Request Body is empty'})
+    }
+    let link = uuidv4().replace(/-/g, '')
     try{
-        let fixture = await service.CreateFixture({home_team, away_team, season, userId, matchtime, link, str})
-        res.status(201).json({message: "fixture created", data:{fixure:fixture, unque_link:link}})
+        let fixture = await service.CreateFixture({home_team, away_team, season, userId, matchtime, link})
+        res.status(201).json({message: "fixture created", data:{fixture:fixture, unique_link:link}})
     }catch(e){
         res.status(500).json({message: "Error Creating Fixture"})
     }
@@ -40,7 +41,7 @@ export const getSingleFixture = async(req: Request, res: Response)=>{
     let fixtureId =  req.params.fixtureId
     try{
         const fixture = await service.GetSingleFixture({fixtureId})
-        if(!fixture) res.status(404).json({message: "No Record Found"})
+        if(!fixture) return res.status(404).json({message: "No Record Found"})
         res.status(201).json({message: "Record Fetched", data: fixture})
     }catch(e){
         res.status(500).json({message: "Error Fetching Record"})
@@ -49,6 +50,9 @@ export const getSingleFixture = async(req: Request, res: Response)=>{
 
 export const editFixture = async(req: Request, res: Response)=>{
     let fixtureId =  req.params.fixtureId
+    if(Object.keys(req.body).length === 0 ){
+        return res.status(400).json({message: 'Request Body is empty'})
+    }
     try{
         const fixture = await service.EditFixture({...req.body, fixtureId} )
         if(fixture.matchedCount == 0) return res.status(404).json({message: "No Record Found"})

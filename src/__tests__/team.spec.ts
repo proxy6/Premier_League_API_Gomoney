@@ -2,21 +2,9 @@ require('dotenv').config();
 import * as request from 'supertest';
 import app from '../../src/server';
 import database from '../../src/database'
-import Team from '../../src/model/team.model';
-import CreateMockUser from '../../src/__mock__/user'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
-import User from '../../src/model/user.model';
-import UserController from '../../src/controller/user.controller';
-import * as jwt from 'jsonwebtoken'
-import { Secret, JwtPayload } from 'jsonwebtoken';
-import RedisDB from '../redis_db';
 
-export const SECRET_KEY: Secret = 'JWT_Secret';
-
-export interface CustomRequest extends Request {
- token: string | JwtPayload;
-}
 describe('TEAMS API', ()=>{
     let token;
     let id;
@@ -29,7 +17,7 @@ describe('TEAMS API', ()=>{
     await mongoose.disconnect()
     })
     describe('Add Teams POST /team', ()=>{
-        describe('Request succeeds if User is Not Authenticated POST /Team', () => {
+        describe('Request succeeds if User is Not Authenticated', () => {
             const Args = {
         	name: 'Exampe Name',
         	short_name: 'example Short Name',
@@ -156,10 +144,24 @@ describe('TEAMS API', ()=>{
 	    });
     })
     describe('View Single Team GET /team/teamId', ()=>{
-        describe('Request succeeds if User is Not Authenticated POST /Team', () => {
+        let teamId
+        beforeAll(async () => {
+            const Args = {
+                name: 'Exampe Name',
+                short_name: 'example Short Name',
+                stadium: 'Example Stadium',
+                userId: id
+            };
+            let team = await request(app)
+            .post("/team")
+            .send(Args)
+            .set({'Authorization': `Bearer ${token}`})
+            teamId = team.body.data._id
+        })
+        describe('Request succeeds if User is Not Authenticated', () => {
             beforeAll(async () => {
             response = await request(app)
-            .get('/team')
+            .get(`/team${teamId}`)
             });
         
             it('returns 401 status code', () => {
@@ -171,7 +173,7 @@ describe('TEAMS API', ()=>{
             });
         })
         describe('Request succeeds if User is Authenticated and Authorized', () => {
-            let teamId
+            
             beforeAll(async ()=>{
                 let user;
                 let UserArgs = {
@@ -187,23 +189,9 @@ describe('TEAMS API', ()=>{
                 id = user.body.newUser._id
             })
             beforeAll(async () => {
-                const Args = {
-                    name: 'Exampe Name',
-                    short_name: 'example Short Name',
-                    stadium: 'Example Stadium',
-                    userId: id
-                };
-                let team = await request(app)
-                .post("/team")
-                .send(Args)
-                .set({'Authorization': `Bearer ${token}`})
-                teamId = team.body.data._id
-            })
-            beforeAll(async () => {
                 response = await request(app)
                 .get(`/team/${teamId}`)
                 .set('Authorization', `Bearer ${token}`);
-                console.log(response.body)
 		    });
 
 		    it('returns 201 status code', () => {
@@ -246,7 +234,6 @@ describe('TEAMS API', ()=>{
             .send(newArgs)
             .set({'Authorization': `Bearer ${token}`})
             teamId = response.body.data._id
-            console.log(teamId)
         })
         describe('Request succeeds if User is Not Authenticated', () => {
             beforeAll(async () => {
@@ -367,7 +354,6 @@ describe('TEAMS API', ()=>{
             .send(newArgs)
             .set({'Authorization': `Bearer ${token}`})
             teamId = response.body.data._id
-            console.log(teamId)
         })
         describe('Request succeeds if User is Not Authenticated', () => {
             beforeAll(async () => {
