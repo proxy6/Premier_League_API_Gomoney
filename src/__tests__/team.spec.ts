@@ -154,7 +154,7 @@ describe('TEAMS API', ()=>{
 			    expect(response.body).toHaveProperty('message');
 			    expect(response.body).toHaveProperty('data');
 			    expect(Object.keys(response.body.data).sort())
-				    .toEqual(['name','short_name','stadium', 'created_by', '_id', 'createdAt', 'updatedAt'].sort());
+				    .toEqual(['name','short_name','stadium', 'created_by', '_id', '__v', 'createdAt', 'updatedAt'].sort());
 		    });
 	    });
     })
