@@ -27,7 +27,10 @@ class TeamService{
     static async ViewSingleTeam(teamData: any){
         const {teamId} = teamData
         try{
+            console.log(teamData)
+            console.log(teamId)
             const team = await Team.findOne({_id: teamId})
+            console.log(team)
             return team
         }catch(e){
             throw new Error('Unable to View Team')
@@ -48,6 +51,7 @@ class TeamService{
             const team = await Team.deleteOne({_id: teamId})
             return team
         }catch(e){
+            console.log(e)
             throw new Error('Unable to Delete Team')
         }
 }

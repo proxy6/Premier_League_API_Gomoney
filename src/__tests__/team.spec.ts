@@ -10,6 +10,7 @@ import User from '../../src/model/user.model';
 import UserController from '../../src/controller/user.controller';
 import * as jwt from 'jsonwebtoken'
 import { Secret, JwtPayload } from 'jsonwebtoken';
+import RedisDB from '../redis_db';
 
 export const SECRET_KEY: Secret = 'JWT_Secret';
 
@@ -17,18 +18,17 @@ export interface CustomRequest extends Request {
  token: string | JwtPayload;
 }
 describe('TEAMS API', ()=>{
+    let token;
+    let id;
+    let response;
 
+    beforeAll(async()=>{
+    await database()
+    })
+    afterAll(async()=>{
+    await mongoose.disconnect()
+    })
     describe('Add Teams POST /team', ()=>{
-        let token;
-	    let id;
-        let response;
-
-        beforeAll(async()=>{
-        await database()
-        })
-        afterAll(async()=>{
-        await mongoose.disconnect()
-        })
         describe('Request succeeds if User is Not Authenticated POST /Team', () => {
             const Args = {
         	name: 'Exampe Name',
@@ -62,7 +62,7 @@ describe('TEAMS API', ()=>{
                 .post('/identity/signup')
                 .send(UserArgs)
                 token = user.body.token
-                id= user._id
+                id= user.body.newUser._id
             })
 		    beforeAll(async () => {
                 const Args = {
@@ -128,12 +128,9 @@ describe('TEAMS API', ()=>{
                 .post('/identity/signup')
                 .send(UserArgs)
                 token = user.body.token
-                console.log(user.body.newUser)
                 id = user.body.newUser._id
             })
             beforeAll(async () => {
-                console.log(id)
-                console.log(token)
                 const Args = {
                     name: 'Exampe Name',
                     short_name: 'example Short Name',
@@ -147,7 +144,7 @@ describe('TEAMS API', ()=>{
 		    });
 
 		    it('returns 201 status code', () => {
-			    expect(response.status).toBe(401);
+			    expect(response.status).toBe(201);
 		    });
 
             it('returns team details', () => {
@@ -158,73 +155,312 @@ describe('TEAMS API', ()=>{
 		    });
 	    });
     })
-    // describe('View All Teams GET /team', ()=>{
-    // let token;
-	// let id;
-    // beforeAll(async()=>{
-    //     await database()
-    //     const user = await CreateMockUser()
-	// 	token = user.token;
-    // })
-
-    // afterAll(async()=>{
-    //     await mongoose.disconnect()
-    // })
-    // describe('Request fails if User is not Authenticated', () => {
-	// 	let response;;
-	// 	beforeAll(async () => {
-    //         response = await request(app)
-    //         .get('/team')
-    //         .set('Authorization', `Bearer ${token}`);
-	// 	});
-
-	// 	it('returns 401 status code', () => {
-	// 		expect(response.status).toBe(401);
-	// 	});
-
-	// 	it('returns error message', () => {
-	// 		expect(response.body).toEqual({message: "User is not Authorized"});
-	// 	});
-	// });
-    // describe('Request is Successful but Response Body is Empty', ()=>{
-    //     let response
-    //     beforeAll(async ()=>{
-    //         response = await request(app)
-    //         .get('/team')
-    //         .set('Authorization', `Bearer ${token}`);
-    //     })
-    //     it('returns 404 status is no response body', ()=>{
-    //         expect(response.status).toBe(404)
-    //         expect(response.body).toEqual({message: "No Record found"})
-    //     })
+    describe('View Single Team GET /team/teamId', ()=>{
+        describe('Request succeeds if User is Not Authenticated POST /Team', () => {
+            beforeAll(async () => {
+            response = await request(app)
+            .get('/team')
+            });
         
-    // })
-    // describe('Request succeeds if User is Authorized', () => {
-	// 	let response;
-	// 	const Args = {
-	// 		name: 'Exampe Name',
-	// 		short_name: 'example Short Name',
-	// 		stadium: 'Example Stadium',
-    //         created_by: id
-	// 	};
+            it('returns 401 status code', () => {
+        	expect(response.status).toBe(401);
+            });
+        
+            it('returns error details', () => {
+        	expect(response.body).toEqual( {message: "User is not Authenticated"});
+            });
+        })
+        describe('Request succeeds if User is Authenticated and Authorized', () => {
+            let teamId
+            beforeAll(async ()=>{
+                let user;
+                let UserArgs = {
+                name: 'Sentry Suit',
+                email: `${uuidv4()}@gmail.com`,
+                password: 'examplepassword',
+                role: "admin"
+                };
+                user = await request(app)
+                .post('/identity/signup')
+                .send(UserArgs)
+                token = user.body.token
+                id = user.body.newUser._id
+            })
+            beforeAll(async () => {
+                const Args = {
+                    name: 'Exampe Name',
+                    short_name: 'example Short Name',
+                    stadium: 'Example Stadium',
+                    userId: id
+                };
+                let team = await request(app)
+                .post("/team")
+                .send(Args)
+                .set({'Authorization': `Bearer ${token}`})
+                teamId = team.body.data._id
+            })
+            beforeAll(async () => {
+                response = await request(app)
+                .get(`/team/${teamId}`)
+                .set('Authorization', `Bearer ${token}`);
+                console.log(response.body)
+		    });
 
-	// 	beforeAll(async () => {
-    //         response = await request(app)
-    //         .post('/team')
-    //         .send(Args)
-    //         .set('Authorization', `Bearer ${token}`);
-	// 	});
+		    it('returns 201 status code', () => {
+			    expect(response.status).toBe(201);
+		    });
 
-	// 	it('returns 201 status code', () => {
-	// 		expect(response.status).toBe(201);
-	// 	});
+            it('returns team details', () => {
+			    expect(response.body).toHaveProperty('message');
+			    expect(response.body).toHaveProperty('data');
+			    expect(Object.keys(response.body.data).sort())
+				    .toEqual(['name','short_name','stadium', 'created_by', '_id', '__v', 'createdAt', 'updatedAt'].sort());
+		    });
+	    });
+    })
+    describe('Edit Team PATCH /team/edit/teamId', ()=>{
+        let teamId
+        let user;
+        beforeAll(async ()=>{
+            let UserArgs = {
+            name: 'Sentry Suit',
+            email: `${uuidv4()}@gmail.com`,
+            password: 'examplepassword',
+            role: "admin"
+            };
+            user = await request(app)
+            .post('/identity/signup')
+            .send(UserArgs)
+            token = user.body.token
+            id= user.body.newUser._id
+        })
+        beforeAll(async ()=>{
+            const newArgs = {
+                name: 'Exampe Name',
+                short_name: 'example Short Name',
+                stadium: 'Example Stadium',
+                userId: id
+            };
+            response = await request(app)
+            .post('/team')
+            .send(newArgs)
+            .set({'Authorization': `Bearer ${token}`})
+            teamId = response.body.data._id
+            console.log(teamId)
+        })
+        describe('Request succeeds if User is Not Authenticated', () => {
+            beforeAll(async () => {
+                const Args = {
+                    name: 'Renamed Name',
+                    short_name: 'Renamed example Short Name',
+                };
+            response = await request(app)
+            .patch(`/team/edit/${teamId}`)
+            .send(Args)
+            });
+        
+            it('returns 401 status code', () => {
+        	expect(response.status).toBe(401);
+            });
+        
+            it('returns error details', () => {
+        	expect(response.body).toEqual( {message: "User is not Authenticated"});
+            });
+        })
+        describe('Request fails if User is Authenticated But Not Authorized', () => {
+            let userToken;
+            beforeAll(async ()=>{
+                let user;
+                let UserArgs = {
+                name: 'Sentry Suit',
+                email: `${uuidv4()}@gmail.com`,
+                password: 'examplepassword',
+                role: "user"
+                };
+                user = await request(app)
+                .post('/identity/signup')
+                .send(UserArgs)
+                userToken = user.body.token
+                id= user.body.newUser._id
+            })
+		    beforeAll(async () => {
+                const Args = {
+                    name: 'Renamed Name',
+                    short_name: 'Renamed example Short Name',
+                };
+                response = await request(app)
+                .patch(`/team/edit/${teamId}`)
+                .send(Args)
+                .set({'Authorization': `Bearer ${userToken}`});
+    
+		    });
+          
 
-    //     it('returns team details', () => {
-	// 		expect(response.body).toHaveProperty('message');
-	// 		expect(response.body).toHaveProperty('data');
-	// });
+		it('returns 401 status code', () => {
+			expect(response.status).toBe(401);
+		});
 
-    // });
-    // })
+		it('returns error message', () => {
+			expect(response.body).toEqual({message: "User is not Authorized"});
+		});
+	    });
+        describe('Request Fails if User is Authenthenticated and Authorized But request payload is empty', ()=>{
+            beforeAll(async ()=>{
+                response = await request(app)
+                .patch(`/team/edit/${teamId}`)
+                .set({'Authorization': `Bearer ${token}`})
+                
+            })
+            it('returns 400 status is no request body', ()=>{
+                expect(response.status).toBe(400)
+                expect(response.body).toHaveProperty('message', "Request Body is empty")
+            })
+            
+        })
+        describe('Request succeeds if User is Authenticated and Authorized with the required payload', () => {
+            beforeAll(async () => {
+                const Args = {
+                    name: 'Renamed Exampe Name',
+                    short_name: 'Renamed example Short Name',
+                };
+                response = await request(app)
+                .patch(`/team/edit/${teamId}`)
+                .send(Args)
+                .set('Authorization', `Bearer ${token}`);
+		    });
 
+		    it('returns 201 status code', () => {
+			    expect(response.status).toBe(201);
+		    });
+
+            it('returns team details', () => {
+			    expect(response.body).toHaveProperty('message', "Record Edited");
+		    });
+	    });
+   
+    })
+    describe('Delete Team DELETE /team/delete/teamId', ()=>{
+        let teamId
+        let user;
+        beforeAll(async ()=>{
+            let UserArgs = {
+            name: 'Sentry Suit',
+            email: `${uuidv4()}@gmail.com`,
+            password: 'examplepassword',
+            role: "admin"
+            };
+            user = await request(app)
+            .post('/identity/signup')
+            .send(UserArgs)
+            token = user.body.token
+            id= user.body.newUser._id
+        })
+        beforeAll(async ()=>{
+            const newArgs = {
+                name: 'Exampe Name',
+                short_name: 'example Short Name',
+                stadium: 'Example Stadium',
+                userId: id
+            };
+            response = await request(app)
+            .post('/team')
+            .send(newArgs)
+            .set({'Authorization': `Bearer ${token}`})
+            teamId = response.body.data._id
+            console.log(teamId)
+        })
+        describe('Request succeeds if User is Not Authenticated', () => {
+            beforeAll(async () => {
+            response = await request(app)
+            .delete(`/team/delete/${teamId}`)
+            });
+        
+            it('returns 401 status code', () => {
+        	expect(response.status).toBe(401);
+            });
+        
+            it('returns error details', () => {
+        	expect(response.body).toEqual( {message: "User is not Authenticated"});
+            });
+        })
+        describe('Request fails if User is Authenticated But Not Authorized', () => {
+            let userToken;
+            beforeAll(async ()=>{
+                let user;
+                let UserArgs = {
+                name: 'Sentry Suit',
+                email: `${uuidv4()}@gmail.com`,
+                password: 'examplepassword',
+                role: "user"
+                };
+                user = await request(app)
+                .post('/identity/signup')
+                .send(UserArgs)
+                userToken = user.body.token
+                id= user.body.newUser._id
+            })
+		    beforeAll(async () => {
+                response = await request(app)
+                .delete(`/team/delete/${teamId}`)
+                .set({'Authorization': `Bearer ${userToken}`});
+		    });   
+
+		it('returns 401 status code', () => {
+			expect(response.status).toBe(401);
+		});
+
+		it('returns error message', () => {
+			expect(response.body).toEqual({message: "User is not Authorized"});
+		});
+	    });
+        describe('Request Fails if User is Authenthenticated and Authorized But Team Record is not Found', ()=>{
+            beforeAll(async ()=>{
+                response = await request(app)
+                .delete(`/team/delete/${teamId}`)
+                .set({'Authorization': `Bearer ${token}`})
+                
+            })
+            beforeAll(async ()=>{
+                response = await request(app)
+                .delete(`/team/delete/${teamId}`)
+                .set({'Authorization': `Bearer ${token}`})
+                
+            })
+
+            it('returns 404 status is no request body', ()=>{
+                expect(response.status).toBe(404)   
+                expect(response.body).toHaveProperty('message', "No Record found")
+            })
+            
+        })
+        describe('Request succeeds if User is Authenticated and Authorized with the required payload', () => {
+            beforeAll(async ()=>{
+                const newArgs = {
+                    name: 'Exampe Name',
+                    short_name: 'example Short Name',
+                    stadium: 'Example Stadium',
+                    userId: id
+                };
+                response = await request(app)
+                .post('/team')
+                .send(newArgs)
+                .set({'Authorization': `Bearer ${token}`})
+                teamId = response.body.data._id
+            })
+            beforeAll(async () => {
+                response = await request(app)
+                .delete(`/team/delete/${teamId}`)
+                .set('Authorization', `Bearer ${token}`);
+		    });
+
+		    it('returns 201 status code', () => {
+			    expect(response.status).toBe(201);
+		    });
+
+            it('returns team details', () => {
+			    expect(response.body).toHaveProperty('message', "Record Deleted");
+		    });
+	    });
+   
+    })
 })
