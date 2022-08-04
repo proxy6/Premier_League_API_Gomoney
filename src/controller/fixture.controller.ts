@@ -77,7 +77,8 @@ export const pendingFixture = async(req: Request, res: Response)=>{
         if(!fixture) return res.status(404).json({message: "No Record Found"})
         return res.status(201).json({message: "Record Fetched", data: fixture})
     }catch(e){
-    res.status(500).json({message: "Error Fetching Record"})
+        console.log(e)
+        res.status(500).json({message: "Error Fetching Record"})
     }
 }
 export const completedFixture = async(req: Request, res: Response)=>{
@@ -86,7 +87,8 @@ export const completedFixture = async(req: Request, res: Response)=>{
         if(!fixture) return res.status(404).json({message: "No Record Found"})
         return res.status(201).json({message: "Record Fetched", data: fixture})
     }catch(e){
-    res.status(500).json({message: "Error Fetching Record"})
+        console.log(e)
+        res.status(500).json({message: "Error Fetching Record"})
     }
 
   

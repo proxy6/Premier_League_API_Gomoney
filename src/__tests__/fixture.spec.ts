@@ -1,11 +1,11 @@
 require('dotenv').config();
 import * as request from 'supertest';
-import app from '../server';
-import database from '../database'
+import app from '../../src/server';
+import database from '../../src/database'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
-import {MockUser} from '../__mock__/user'
-import AdminMockUser from '../__mock__/user'
+import {MockUser, AdminMockUser} from '../../src/__mock__/user'
+
 
 describe('FIXTURE API', ()=>{
     let token;
@@ -32,7 +32,7 @@ describe('FIXTURE API', ()=>{
             matchtime: new Date(),
             link
         };
-        describe('Request succeeds if User is Not Authenticated POST /Fixture', () => {
+        describe('Request fails if User is Not Authenticated POST /Fixture', () => {
         
             beforeAll(async () => {
                 response = await request(app)
@@ -41,7 +41,7 @@ describe('FIXTURE API', ()=>{
             });
         
             it('returns error details', () => {
-        	expect(response.body).toEqual( {message: "User is not Authenticated"});
+        	expect(response.body).toEqual({message: "User is not Authenticated"});
             });
         })
         describe('Request fails if User is Authenticated But Not Authorized', () => {
@@ -95,7 +95,7 @@ describe('FIXTURE API', ()=>{
 		    });
 	    });
     })
-    describe('View Single Team GET /fixture/fixtureId', ()=>{
+    describe('View Single Fixture GET /fixture/fixtureId', ()=>{
         let fixtureId;
         let link = uuidv4().replace(/-/g, '')
         const Args = {
@@ -113,7 +113,7 @@ describe('FIXTURE API', ()=>{
             .set({'Authorization': `Bearer ${adminUser.token}`})
             fixtureId = response.body.data.fixture._id
         })
-        describe('Request succeeds if User is Not Authenticated', () => {
+        describe('Request fails if User is Not Authenticated', () => {
             beforeAll(async () => {
             response = await request(app)
             .get(`/fixture/${fixtureId}`)
@@ -163,7 +163,7 @@ describe('FIXTURE API', ()=>{
             .set({'Authorization': `Bearer ${adminUser.token}`})
             fixtureId = response.body.data.fixture._id
         })
-        describe('Request succeeds if User is Not Authenticated', () => {
+        describe('Request fails if User is Not Authenticated', () => {
             beforeAll(async () => {
                 const Args = {
                     season: '2023/2024'
@@ -254,7 +254,7 @@ describe('FIXTURE API', ()=>{
             .set({'Authorization': `Bearer ${adminUser.token}`})
             fixtureId = response.body.data.fixture._id
         })
-        describe('Request succeeds if User is Not Authenticated', () => {
+        describe('Request fails if User is Not Authenticated', () => {
             beforeAll(async () => {
             response = await request(app)
             .delete(`/fixture/delete/${fixtureId}`)
@@ -336,5 +336,105 @@ describe('FIXTURE API', ()=>{
 		    });
 	    });
    
+    })
+    describe('View Pending Fixtures', ()=>{
+        beforeAll(async ()=>{
+            let link = uuidv4().replace(/-/g, '')
+            const Args = {
+                home_team: "62d5bd48125c87a4328c9e7b",
+                away_team: "62d5cfb323b14081e912d926",
+                season: "2022/2023",
+                userId: "62d53eb20578e03024d9d19c",
+                matchtime: new Date().setHours(23, 0, 0, 0),
+                link
+            };
+            response = await request(app)
+            .post('/fixture')
+            .send(Args)
+            .set({'Authorization': `Bearer ${adminUser.token}`})
+        })
+       describe('Request fails if user is not authenticated', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/pending')
+        })
+        it('returns 401 code and User unauthenticated message', ()=>{
+            expect(response.status).toBe(401)
+            expect(response.body).toHaveProperty('message', 'User is not Authenticated')
+        });   
+       }); 
+       describe('Request fails if Authentication is provided but its expired or invalid', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/pending')
+            .set({'Authorization': `Bearer ${user.token}invalid`})
+        })
+        it('returns 401code with unable to complete unthentication message', ()=>{
+            expect(response.status).toBe(401)
+            expect(response.body).toHaveProperty('message', 'Unable To Complete Authentication')
+        });
+       });
+       describe('Request succeds if authentication is valid', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/pending')
+            .set({'Authorization': `Bearer ${user.token}`})
+        });
+        it('returns 201 status with pending fixtures data', ()=>{
+            expect(response.status).toBe(201)
+            expect(response.body).toHaveProperty('data')
+            expect(response.body).toHaveProperty('message', 'Record Fetched')
+        });
+       });
+    });
+    describe('View Completed Fixtures', ()=>{
+        beforeAll(async ()=>{
+            let link = uuidv4().replace(/-/g, '')
+            const Args = {
+                home_team: "62d5bd48125c87a4328c9e7b",
+                away_team: "62d5cfb323b14081e912d926",
+                season: "2022/2023",
+                userId: "62d53eb20578e03024d9d19c",
+                matchtime: new Date(2014),
+                link
+            };
+            response = await request(app)
+            .post('/fixture')
+            .send(Args)
+            .set({'Authorization': `Bearer ${adminUser.token}`})
+        })
+       describe('Request fails if user is not authenticated', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/completed')
+        })
+        it('returns 401 code and User unauthenticated message', ()=>{
+            expect(response.status).toBe(401)
+            expect(response.body).toHaveProperty('message', 'User is not Authenticated')
+        });   
+       }); 
+       describe('Request fails if Authentication is provided but its expired or invalid', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/completed')
+            .set({'Authorization': `Bearer ${user.token}invalid`})
+        })
+        it('returns 401code with unable to complete unthentication message', ()=>{
+            expect(response.status).toBe(401)
+            expect(response.body).toHaveProperty('message', 'Unable To Complete Authentication')
+        });
+       });
+       describe('Request succeds if authentication is valid', ()=>{
+        beforeAll(async ()=>{
+            response = await request(app)
+            .get('/fixture/completed')
+            .set({'Authorization': `Bearer ${user.token}`})
+        });
+        it('returns 201 status with pending fixtures data', ()=>{
+            expect(response.status).toBe(201)
+            expect(response.body).toHaveProperty('data')
+            expect(response.body).toHaveProperty('message', 'Record Fetched')
+        });
+       });
     })
 })

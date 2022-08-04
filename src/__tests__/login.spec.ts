@@ -52,7 +52,6 @@ describe('USER Login /identity/login', ()=>{
     describe('Request fails if User Exist but Password is Not Correct', () => {
 		let response;
 		const exampleEmail = 'example@gmail.com';
-		
 		const Args = {
 			email: exampleEmail,
 			password: 'thisisapass',
@@ -75,20 +74,19 @@ describe('USER Login /identity/login', ()=>{
 			expect(response.body).toEqual({message: "Email or Password Incorrect"});
 		});
 	});
-    describe('Request succeds if User Password is Correct', () => {
+    describe('Request succeds if User Exist and Password is Correct', () => {
 		let response;
-		let uuid = uuidv4().replace(/-/g, "")
-		const exampleEmail = `random${uuid.slice(6)}@gmail.com`;
-		const Argument = {
-			email: "example2@gmail.com",
+		const exampleEmail = `${uuidv4()}@gmail.com`;
+		const Args = {
+			email: exampleEmail,
 			password: '19960000',
             name: "Example Name"
 		};
-		const password = Argument.password
+		const password = Args.password
 		beforeAll(async () => {
-            await UserController.Login(Argument)
+			await UserController.Signup(Args)
 			response = await request(app).post('/identity/login').send({
-                name: "example2@gmail.com",
+                email: exampleEmail,
 			    password: '19960000'
             });
 		});
@@ -100,7 +98,7 @@ describe('USER Login /identity/login', ()=>{
 		it('returns user login details', () => {
 			expect(response.body).toHaveProperty('data');
 			expect(Object.keys(response.body.data).sort())
-				.toEqual(['name','email','role', '_id', 'createdAt', 'updatedAt'].sort());
+				.toEqual(['name','email','role', '_id', 'password', '__v','createdAt', 'updatedAt'].sort());
 		});
 	});
 

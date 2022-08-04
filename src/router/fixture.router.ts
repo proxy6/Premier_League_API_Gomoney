@@ -6,7 +6,7 @@ const router = Router();
 router.post('/', isAuthorized('admin'), createFixture)
 router.get('/', isAuthorized('admin', 'user'), getAllFixtures)
 router.get('/completed',isAuthorized('user', 'admin'), completedFixture)
-router.post('/pending', isAuthorized('admin', 'user'), pendingFixture)
+router.get('/pending', isAuthorized('admin', 'user'), pendingFixture)
 router.get('/:fixtureId', isAuthorized('admin', 'user'), getSingleFixture)
 router.patch('/edit/:fixtureId', isAuthorized('admin'), editFixture)
 router.delete('/delete/:fixtureId', isAuthorized('admin'), deleteFixture)

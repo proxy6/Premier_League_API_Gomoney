@@ -5,7 +5,7 @@ import LoginUser from '../controller/user.controller';
 import UserController from '../controller/user.controller';
 
 
-export const MockUser = async ({ name= 'Exampe Name', email= "example@gmail.com", password= 'thisisapassword'}= {}) => {
+export const MockUser = async () => {
 	let UserArgs = {
 		name: 'Sentry Suit',
 		email: `${uuidv4()}@gmail.com`,
@@ -27,4 +27,3 @@ export const AdminMockUser = async ({ name= 'Exampe Name', email= "example@gmail
 	return  user
 };
 
-export default AdminMockUser

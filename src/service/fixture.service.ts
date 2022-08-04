@@ -92,6 +92,7 @@ class FixtureService{
         const fixture = await Fixture.find({matchtime:{$gt: new Date()}})
         return fixture
         }catch(e){
+            console.log(e)
             throw new Error('Unable to Fetch Fixtures')
         }
     }
