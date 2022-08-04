@@ -1,10 +1,10 @@
 require('dotenv').config();
 import * as request from 'supertest';
-import app from '../../src/server';
-import database from '../../src/database'
+import app from '../server';
+import database from '../database'
 import mongoose from 'mongoose'
 import {v4 as uuidv4} from 'uuid'
-import {MockUser, AdminMockUser} from '../../src/__mock__/user'
+import {MockUser, AdminMockUser} from '../__mock__/user'
 
 
 describe('TEAM API', ()=>{
