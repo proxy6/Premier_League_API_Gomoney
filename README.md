@@ -4,6 +4,9 @@
 * After cloning run `npm i`
 * To start the application run `npm run start`
 
+### Rate Limiting
+- Rate Limiting Applied, Limits each IP to 1000 requests per `window` (per 15 minutes for development purpose)
+
 ### Endpoints
 ALL `http://localhost:5005/`
 
