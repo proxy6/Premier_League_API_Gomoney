@@ -1,7 +1,4 @@
-import User from '../model/user.model'
-import UserService from '../service/user.service'
 import {v4 as uuidv4} from 'uuid'
-import LoginUser from '../controller/user.controller';
 import UserController from '../controller/user.controller';
 
 

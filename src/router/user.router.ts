@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response, Router} from 'express'
-import UserController, { login, signUp } from '../controller/user.controller'
+import UserController, { login} from '../controller/user.controller'
 
 // import Admin from './model/admin.model'
 
